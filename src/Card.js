@@ -5,6 +5,8 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
+import moment from 'moment';
+import 'moment/locale/fr';
 
 const styles = {
   card: {
@@ -15,10 +17,15 @@ const styles = {
   media: {
     paddingTop: '56.25%', // 16:9
   },
+  subtext: {
+    color: '#757575',
+  }
 };
 
 const SimpleMediaCard = (props) => {
   const { classes } = props;
+  moment.locale('fr');
+  const publishedAtCard = moment(props.publishedAtCard).format('LL');
   return (
     <div>
       <Card className={classes.card}>
@@ -34,8 +41,8 @@ const SimpleMediaCard = (props) => {
           <Typography component="p">
             {props.descriptionCard}
           </Typography>
-          <Typography component="p">
-            {props.publishedAtCard} - {props.authorCard}
+          <Typography component="p" className={classes.subtext}>
+            {publishedAtCard} - {props.authorCard}
           </Typography>
         </CardContent>
       </Card>
