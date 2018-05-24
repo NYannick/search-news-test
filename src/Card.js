@@ -22,13 +22,17 @@ const styles = {
   }
 };
 
+const handleClick = (value) => {
+  window.open(value, "_blank");
+}
+
 const SimpleMediaCard = (props) => {
   const { classes } = props;
   moment.locale('fr');
   const publishedAtCard = moment(props.publishedAtCard).format('LL');
   return (
     <div>
-      <Card className={classes.card}>
+      <Card className={classes.card} onClick={handleClick.bind(this, props.urlCard)}>
         <CardMedia
           className={classes.media}
           image={props.urlToImageCard}

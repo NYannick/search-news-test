@@ -246,7 +246,7 @@ class App extends Component {
     }));
 
     const articles = this.state.articles.map((article, key) => {
-      return <SimpleMediaCard key={key} urlToImageCard={article.urlToImage} titleCard={article.title} descriptionCard={article.description} publishedAtCard={article.publishedAt} authorCard={article.author} />
+      return <SimpleMediaCard key={key} urlCard={article.url} urlToImageCard={article.urlToImage} titleCard={article.title} descriptionCard={article.description} publishedAtCard={article.publishedAt} authorCard={article.author} />
     })
 
     return (
