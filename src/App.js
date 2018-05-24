@@ -12,46 +12,9 @@ import ClearIcon from '@material-ui/icons/Clear';
 import Chip from 'material-ui/Chip';
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
+import SimpleMediaCard from './Card';
 
-const suggestions = [
-  { label: 'Afghanistan' },
-  { label: 'Aland Islands' },
-  { label: 'Albania' },
-  { label: 'Algeria' },
-  { label: 'American Samoa' },
-  { label: 'Andorra' },
-  { label: 'Angola' },
-  { label: 'Anguilla' },
-  { label: 'Antarctica' },
-  { label: 'Antigua and Barbuda' },
-  { label: 'Argentina' },
-  { label: 'Armenia' },
-  { label: 'Aruba' },
-  { label: 'Australia' },
-  { label: 'Austria' },
-  { label: 'Azerbaijan' },
-  { label: 'Bahamas' },
-  { label: 'Bahrain' },
-  { label: 'Bangladesh' },
-  { label: 'Barbados' },
-  { label: 'Belarus' },
-  { label: 'Belgium' },
-  { label: 'Belize' },
-  { label: 'Benin' },
-  { label: 'Bermuda' },
-  { label: 'Bhutan' },
-  { label: 'Bolivia, Plurinational State of' },
-  { label: 'Bonaire, Sint Eustatius and Saba' },
-  { label: 'Bosnia and Herzegovina' },
-  { label: 'Botswana' },
-  { label: 'Bouvet Island' },
-  { label: 'Brazil' },
-  { label: 'British Indian Ocean Territory' },
-  { label: 'Brunei Darussalam' },
-].map(suggestion => ({
-  value: suggestion.label,
-  label: suggestion.label,
-}));
+const APIKEY = "e7ce12be521749baa79b2f7e75205655";
 
 class Option extends Component {
   handleClick = event => {
@@ -227,20 +190,64 @@ const styles = theme => ({
 });
 
 class App extends Component {
-  state = {
-    single: null,
-    multi: null,
-    multiLabel: null,
+  constructor(props) {
+    super(props);
+    this.state = {
+      single: null,
+      suggestions: [],
+      articles: [],
+    };
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(value) {
+    const articles = [];
+    fetch('https://newsapi.org/v2/top-headlines?sources=' + value + '&apiKey=' + APIKEY)
+    .then(results => {
+      return results.json();
+    }).then(data => {
+      data.articles.map((arc => {
+        return articles.push({
+          title : `${arc.title}`,
+          author : `${arc.author}`,
+          description : `${arc.description}`,
+          url : `${arc.url}`,
+          urlToImage : `${arc.urlToImage}`,
+          publishedAt : `${arc.publishedAt}`
+        })
+      }))
+      this.setState({
+        single: value,
+        articles: articles
+      });
+    })
   };
 
-  handleChange = name => value => {
-    this.setState({
-      [name]: value,
-    });
-  };
+  componentDidMount() {
+    const suggestions = [];
+    fetch('https://newsapi.org/v2/sources?apiKey=' + APIKEY)
+    .then(results => {
+      return results.json();
+    }).then(data => {
+      data.sources.map((src => {
+        return suggestions.push({ label : `${src.name}`, id : `${src.id}` })
+      }))
+
+      this.setState({ suggestions: suggestions });
+    })
+  }
 
   render() {
     const { classes } = this.props;
+
+    const suggestions = this.state.suggestions.map(suggestion => ({
+      value: suggestion.id,
+      label: suggestion.label,
+    }));
+
+    const articles = this.state.articles.map((article, key) => {
+      return <SimpleMediaCard key={key} urlToImageCard={article.urlToImage} titleCard={article.title} descriptionCard={article.description} publishedAtCard={article.publishedAt} authorCard={article.author} />
+    })
 
     return (
       <div className={classes.root}>
@@ -248,7 +255,7 @@ class App extends Component {
           fullWidth
           inputComponent={SelectWrapped}
           value={this.state.single}
-          onChange={this.handleChange('single')}
+          onChange={this.handleChange}
           placeholder="Search news"
           id="react-select-single"
           inputProps={{
@@ -259,6 +266,9 @@ class App extends Component {
             options: suggestions,
           }}
         />
+        <div>
+          {articles}
+        </div>
       </div>
     );
   }
